@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: tracewise
+Version: 0.1.0
+Summary: TraceWise (đề M3): trợ lý LLM/RAG cho SOC analyst
+Requires-Python: >=3.12

@@ -1,0 +1,59 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: tracewise
+          POSTGRES_PASSWORD: ci_only_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      M3_PG_DSN: postgresql://postgres:ci_only_password@localhost:5432/tracewise
+      STIX_URL: https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master/enterprise-attack/enterprise-attack-18.1.json
+      STIX_MD5: 4be6b501abe1fa6c7616f3666be5ac3f
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Cache ATT&CK 18.1
+        id: attack-cache
+        uses: actions/cache@v4
+        with:
+          path: data/attack/enterprise-attack-18.1.json
+          key: attack-18.1-4be6b501abe1fa6c7616f3666be5ac3f
+
+      - name: Download ATT&CK 18.1
+        if: steps.attack-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p data/attack
+          curl -sSL "$STIX_URL" -o data/attack/enterprise-attack-18.1.json
+
+      - name: Check ATT&CK MD5
+        run: echo "$STIX_MD5  data/attack/enterprise-attack-18.1.json" | md5sum -c -
+
+      - name: Lint (pyflakes)
+        run: python -m pyflakes tracewise tests
+
+      - name: Tests
+        run: python -m pytest -q

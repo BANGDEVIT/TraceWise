@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+tests/test_data_files.py
+tracewise/__init__.py
+tracewise.egg-info/PKG-INFO
+tracewise.egg-info/SOURCES.txt
+tracewise.egg-info/dependency_links.txt
+tracewise.egg-info/top_level.txt

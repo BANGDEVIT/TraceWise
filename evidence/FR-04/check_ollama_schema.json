@@ -1,0 +1,116 @@
+{
+  "model": "qwen3.5:4b",
+  "base": "http://localhost:11434",
+  "time": "2026-11-19 17:44:29+0700",
+  "ollama_version": "0.40.16",
+  "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+  "quantization": "Q4_K_M",
+  "parameter_size": "4.2B",
+  "modes": {
+    "v1 + reasoning_effort=none": {
+      "verdict": "CÓ áp enum",
+      "runs": [
+        {
+          "http": 200,
+          "wall_s": 135.1,
+          "raw": "{\n  \"verdict\": \"suspicious\",\n  \"summary\": \"Hệ thống ghi nhận một hành vi đáng ngờ khi trình duyệt web (p.exe) cố gắng truy cập vào bộ nhớ của quy trình lsass.exe, đây là mục tiêu thường được các mối đe dọa sử dụng để lấy thông tin đăng nhập hoặc thực thi mã độc. Sự kiện này được phát hiện bởi rule 100400 với mức độ nghiêm trọng level 12 tại máy lab-win02 vào ngày 18/11/2026 [E1].\",\"techniques\": [\n    {\"id\": \"T1562.001\", \"rank\": 3, \"evidence\": [\n      \"[E1] 2026-11-18 11:23 | máy lab-win02 | rule 100400 (level 12) Access to lsass process memory\"\n    ],\"reason\": \"Quy trình p.exe đã thực hiện truy cập vào bộ nhớ của lsass, một kỹ thuật phổ biến để thu thập thông tin đăng nhập hoặc đọc token.\"},\n    {\"id\": \"T1562.001\", \"rank\": 3, \"evidence\": [\n      \"[E2] SourceImage: C:\\\\Users\\\\Public\\\\p.exe TargetImage: C:\\\\Windows\\\\System32\\\\lsass.exe GrantedAccess: 0x1010\"\n    ],\"reason\": \"Chứng cứ cụ thể cho thấy trình duyệt p.exe đã được cấp quyền truy cập (0x1010) vào quá trình lsass.\"}\n  ],\n  \"confidence\": 0.85,\n  \"insufficient_evidence\": false\n}",
+          "finish_reason": "stop",
+          "thinking_chars": 0,
+          "completion_tokens": 388,
+          "json_ok": true,
+          "fields_ok": true,
+          "codes": [
+            "T1562.001",
+            "T1562.001"
+          ],
+          "in_enum": true,
+          "ca": "thuong"
+        },
+        {
+          "http": 200,
+          "wall_s": 77.9,
+          "raw": "{\n  \"verdict\": \"suspicious\",\n  \"summary\": \"Có bằng chứng cho thấy quá trình `p.exe` từ thư mục công cộng đã cố gắng truy cập bộ nhớ của quy trình LSASS, một hành vi đặc trưng của kỹ thuật lấy thông tin nhạy cảm (T1003.001). Cụ thể, nhật ký cảnh báo [E1] ghi lại sự cố truy cập vào quá trình `lsass` tại thời điểm 11:23 ngày 18/11/2026 trên máy lab-win02, và chi tiết kỹ thuật [E2] xác nhận hình ảnh nguồn là `C:\\\\\",\"techniques\": [\n    {\n      \"id\": \"T1082\",\n      \"rank\": 3,\n      \"evidence\": [\n        \"[E1]\",\n        \"[E2]\"\n      ],\"reason\": \"Hành vi truy cập bộ nhớ LSASS bằng cách sử dụng quá trình bên ngoài (p.exe) là đặc điểm của kỹ thuật lấy thông tin nhạy cảm (T1082), không phải T1003.001.\"\n    }\n  ],\n  \"confidence\": 0.95,\n  \"insufficient_evidence\": false\n}",
+          "finish_reason": "stop",
+          "thinking_chars": 0,
+          "completion_tokens": 286,
+          "json_ok": true,
+          "fields_ok": true,
+          "codes": [
+            "T1082"
+          ],
+          "in_enum": true,
+          "ca": "bay"
+        }
+      ]
+    },
+    "v1": {
+      "verdict": "CHƯA kết luận (ca bẫy không trả mã nào)",
+      "runs": [
+        {
+          "http": 200,
+          "wall_s": 135.6,
+          "raw": "",
+          "finish_reason": "length",
+          "thinking_chars": 1539,
+          "completion_tokens": 500,
+          "json_ok": false,
+          "fields_ok": false,
+          "codes": [],
+          "in_enum": null,
+          "ca": "thuong"
+        },
+        {
+          "http": 200,
+          "wall_s": 125.1,
+          "raw": "",
+          "finish_reason": "length",
+          "thinking_chars": 1730,
+          "completion_tokens": 500,
+          "json_ok": false,
+          "fields_ok": false,
+          "codes": [],
+          "in_enum": null,
+          "ca": "bay"
+        }
+      ]
+    },
+    "native /api/chat": {
+      "verdict": "CÓ áp enum",
+      "runs": [
+        {
+          "http": 200,
+          "wall_s": 96.2,
+          "raw": "{\n  \"verdict\": \"suspicious\",\n  \"summary\": \"Hệ thống ghi nhận một hành vi đáng ngờ khi trình duyệt web (p.exe) cố gắng truy cập vào bộ nhớ của quy trình lsass.exe, đây là mục tiêu thường được các mối đe dọa sử dụng để lấy thông tin đăng nhập hoặc thực thi mã độc. Sự kiện này được phát hiện bởi rule 100400 với mức độ nghiêm trọng level 12 tại máy lab-win02 vào ngày 18/11/2026 [E1].\",\"techniques\": [\n    {\"id\": \"T1562.001\", \"rank\": 3, \"evidence\": [\n      \"[E1] 2026-11-18 11:23 | máy lab-win02 | rule 100400 (level 12) Access to lsass process memory\"\n    ],\"reason\": \"Quy trình p.exe đã thực hiện truy cập vào bộ nhớ của lsass, một kỹ thuật phổ biến để thu thập thông tin đăng nhập hoặc đọc token.\"},\n    {\"id\": \"T1562.001\", \"rank\": 3, \"evidence\": [\n      \"[E2] SourceImage: C:\\\\Users\\\\Public\\\\p.exe TargetImage: C:\\\\Windows\\\\System32\\\\lsass.exe GrantedAccess: 0x1010\"\n    ],\"reason\": \"Chứng cứ cụ thể cho thấy trình duyệt p.exe đã được cấp quyền truy cập (0x1010) vào quá trình lsass.\"}\n  ],\n  \"confidence\": 0.85,\n  \"insufficient_evidence\": false\n}",
+          "finish_reason": "stop",
+          "thinking_chars": 0,
+          "completion_tokens": 388,
+          "eval_rate_tok_s": 4.05,
+          "json_ok": true,
+          "fields_ok": true,
+          "codes": [
+            "T1562.001",
+            "T1562.001"
+          ],
+          "in_enum": true,
+          "ca": "thuong"
+        },
+        {
+          "http": 200,
+          "wall_s": 86.2,
+          "raw": "{\n  \"verdict\": \"suspicious\",\n  \"summary\": \"Có bằng chứng cho thấy quá trình `p.exe` từ thư mục công cộng đã cố gắng truy cập bộ nhớ của quy trình LSASS, một hành vi đặc trưng của kỹ thuật lấy thông tin nhạy cảm (T1003.001). Cụ thể, nhật ký cảnh báo [E1] ghi lại sự cố truy cập vào quá trình `lsass` tại thời điểm 11:23 ngày 18/11/2026 trên máy lab-win02, và chi tiết kỹ thuật [E2] xác nhận hình ảnh nguồn là `C:\\\\\",\"techniques\": [\n    {\n      \"id\": \"T1082\",\n      \"rank\": 3,\n      \"evidence\": [\n        \"[E1]\",\n        \"[E2]\"\n      ],\"reason\": \"Hành vi truy cập bộ nhớ LSASS bằng cách sử dụng quá trình bên ngoài (p.exe) là đặc điểm của kỹ thuật lấy thông tin nhạy cảm (T1082), không phải T1003.001.\"\n    }\n  ],\n  \"confidence\": 0.95,\n  \"insufficient_evidence\": false\n}",
+          "finish_reason": "stop",
+          "thinking_chars": 0,
+          "completion_tokens": 286,
+          "eval_rate_tok_s": 3.65,
+          "json_ok": true,
+          "fields_ok": true,
+          "codes": [
+            "T1082"
+          ],
+          "in_enum": true,
+          "ca": "bay"
+        }
+      ]
+    }
+  }
+}
