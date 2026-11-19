@@ -1,0 +1,9 @@
+[project]
+name = "tracewise"
+version = "0.1.0"
+description = "TraceWise (đề M3): trợ lý LLM/RAG cho SOC analyst"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

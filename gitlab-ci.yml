@@ -1,0 +1,27 @@
+.gitlab-ci.yml (đổi đường dẫn pyflakes và tên database so với bản cũ):
+
+yaml
+stages: [test]
+
+test:
+  stage: test
+  image: python:3.13-slim
+  services:
+    - name: pgvector/pgvector:pg16
+      alias: postgres
+  variables:
+    POSTGRES_DB: tracewise
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: ci_only_password
+    M3_PG_DSN: postgresql://postgres:ci_only_password@postgres:5432/tracewise
+    STIX_URL: https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master/enterprise-attack/enterprise-attack-18.1.json
+    STIX_MD5: 4be6b501abe1fa6c7616f3666be5ac3f
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq curl > /dev/null
+    - pip install -q -r requirements.txt
+    - mkdir -p data/attack
+    - curl -sSL "$STIX_URL" -o data/attack/enterprise-attack-18.1.json
+    - echo "$STIX_MD5  data/attack/enterprise-attack-18.1.json" | md5sum -c -
+  script:
+    - python -m pyflakes tracewise/ tests/
+    - python -m pytest -q

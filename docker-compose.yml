@@ -1,0 +1,17 @@
+# Postgres + pgvector cho TraceWise. copy .env.example thành .env, điền mật khẩu, rồi chạy
+#   docker compose up -d
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: tracewise-pg
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Thiếu POSTGRES_PASSWORD trong .env}
+      POSTGRES_DB: tracewise
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - tracewise-pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  tracewise-pgdata:
