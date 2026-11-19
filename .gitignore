@@ -1,0 +1,13 @@
+# bí mật
+.env
+# dữ liệu lớn, tải lại được (MD5 ghi trong README)
+data/raw/
+data/otrf/*.zip
+data/attack/*.json
+# kết quả chạy
+results/*.png
+# Python, Jupyter, môi trường ảo
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
