@@ -1,0 +1,13 @@
+ma,yeu_cau,phu_trach,code,test,bang_chung,kiem_tra,trang_thai
+FR-01,Nhận cảnh báo và lưu mã cảnh báo,Bằng,,tests/test_fr01.py,evidence/FR-01/,Demo,chua_lam
+FR-02,Tóm tắt tiếng Việt ≤ 10 câu,Bằng,,tests/test_fr02.py,evidence/FR-02/,Demo + chấm tay 10 mẫu,chua_lam
+FR-03,≥ 1 mã trong bảng repo hoặc cờ chưa đủ căn cứ,Bằng,,tests/test_fr03.py,evidence/FR-03/,Kiểm thử,chua_lam
+FR-04,Mã ngoài bảng repo không được trả về,Bằng,,tests/test_fr04.py,evidence/FR-04/,Kiểm thử,chua_lam
+FR-05,Người phân tích lưu nhãn riêng tách khỏi nhãn mô hình,Bằng,,tests/test_fr05.py,evidence/FR-05/,Demo,chua_lam
+FR-06,3 ca chèn prompt chỉ trả mã thuộc bảng hoặc cờ,Bằng,,tests/test_fr06.py,evidence/FR-06/,Kiểm thử,chua_lam
+FR-07,Từ chối địa chỉ mô hình ngoài danh sách lab,Bằng,,tests/test_fr07.py,evidence/FR-07/,Kiểm thử,chua_lam
+FR-08,Nhật ký: mã cảnh báo; mã mô hình; mã người lưu; thời điểm,Bằng,,tests/test_fr08.py,evidence/FR-08/,Kiểm thử,chua_lam
+NFR-01,Không có địa chỉ SIEM đang vận hành trong cấu hình mẫu,Bằng,,,evidence/NFR-01/,Rà soát,chua_lam
+NFR-02,Địa chỉ ngoài danh sách thì lệnh dừng,Bằng,,tests/test_fr07.py,evidence/NFR-02/,Kiểm thử,chua_lam
+NFR-03,README chạy 3 ca chèn + 1 ca thường,Bằng,,,evidence/NFR-03/,Demo,chua_lam
+NFR-04,Tóm tắt cắt ở 10 câu,Bằng,,tests/test_nfr04.py,evidence/NFR-04/,Kiểm thử,chua_lam

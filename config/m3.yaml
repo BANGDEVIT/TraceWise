@@ -1,0 +1,33 @@
+# Cấu hình M3. Đổi mô hình hay máy chủ LLM: chỉ sửa file này,
+# hoặc tạo file khác rồi trỏ biến môi trường M3_CONFIG tới nó. Không sửa code.
+
+llm: # máy chủ tương thích OpenAI
+  base_url: http://localhost:11434/v1 # Ollama; vLLM, LM Studio... cũng có /v1
+  model: qwen3.5:4b
+  api_key_env: M3_LLM_API_KEY # tên biến môi trường chứa khóa (Ollama không cần)
+  temperature: 0.0
+  seed: 42
+  max_tokens: 500
+  timeout_s: 900
+  response_format: json_schema # json_schema | json_object | none
+  reasoning_effort: none # tắt thinking của Qwen; để null nếu máy chủ không hỗ trợ
+
+embed:
+  base_url: http://localhost:11434/v1
+  model: embeddinggemma
+  query_prefix: "task: search result | query: " # tiền tố truy vấn của EmbeddingGemma
+
+allowlist_file: data/srs/allowlist_llm.yaml
+
+analysis:
+  prompt: analyze_v1 # file prompts/<tên>.md
+  summary_prompt: summary_v1
+  rag: true
+  k: 5
+  platform_filter: true # lọc kỹ thuật theo hệ điều hành
+  query_mode: pack # pack | summary lấy gì làm câu truy vấn cho RAG: pack	Chính gói bằng chứng, summary	Một bản tóm tắt do Qwen viết trước
+
+db:
+  dsn_env: M3_PG_DSN # chuỗi kết nối (có mật khẩu) nằm trong .env, không ghi ở đây
+
+attack_stix: data/attack/enterprise-attack-18.1.json
