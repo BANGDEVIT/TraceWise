@@ -10,7 +10,7 @@ from urllib.parse import (
 import yaml
 from .settings import ROOT
 
-SRS_DIR = ROOT / "DATA" / "srs"
+SRS_DIR = ROOT / "data" / "srs"
 
 
 # ---------- dữ liệu của thầy ----------
