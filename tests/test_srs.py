@@ -5,7 +5,6 @@ import pytest
 from tracewise import srs
 
 
-# bộ dữ liệu của thầy được nạp đủ và đúng, không thiếu file, không lệch số.
 def test_alerts_whitelist_labels():
     alerts = srs.load_alerts()
     assert len(alerts) == 35 and alerts[0]["id"] == "LAB-0001"
@@ -16,7 +15,6 @@ def test_alerts_whitelist_labels():
     assert labels["LAB-0031"]["ma_attack"] is None
 
 
-# kich_ban chia đúng 17 nhóm độc lập, là nền cho bootstrap theo kịch bản mà bạn hỏi hôm trước.
 def test_scenarios_give_17_independent_groups():
     labels = srs.load_labels()
     groups = {lb["kich_ban"] for lb in labels.values()}
@@ -36,7 +34,6 @@ def test_scenarios_give_17_independent_groups():
         "http://LOCALHOST:11434",
     ],
 )
-# các host hợp lệ phải được cho qua, kể cả khi viết theo nhiều kiểu khác nhau.
 def test_allowed_hosts(url):
     assert srs.check_host(url).startswith("http")
 
@@ -52,7 +49,19 @@ def test_allowed_hosts(url):
         "http://0.0.0.0:11434",
     ],
 )
-# các cách lách allowlist đều phải bị chặn, tức báo lỗi HostNotAllowed
 def test_blocked_hosts(url):
     with pytest.raises(srs.HostNotAllowed):
         srs.check_host(url)
+
+
+def test_alert_lines_level0_pack():
+    alerts = {a["id"]: a for a in srs.load_alerts()}
+    lines = srs.alert_lines(alerts["LAB-0029"])
+    assert (
+        lines[0].startswith("rule 100400 (level 12)") and lines[1] == "agent: lab-win02"
+    )
+    assert "lsass.exe" in lines[2] and len(lines) == 3
+    assert srs.alert_lines(alerts["LAB-0035"])[3].startswith("data.file_name:")
+    assert not srs.alert_lines(alerts["LAB-0029"], with_rule=False)[0].startswith(
+        "rule"
+    )
