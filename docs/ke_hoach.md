@@ -11,25 +11,26 @@ Mốc HD: ngày 10 — bộ dữ liệu + bảng mã được duyệt, bảng t�
 - [x] Dữ liệu của thầy, ATT&CK 18.1 + MD5, 4 test dữ liệu, CI (19/11)
 - [x] `docs/truy_vet.csv`, `evidence/nghiem_thu.md`, thư mục `evidence/` (19/11)
 - [x] README, nhật ký (19/11)
+- [x] Chuyển CI sang GitHub Actions (19/11)
 
 ### Ngày 1–2 — B6: Ollama có áp JSON schema + enum
 - [x] `scripts/check_ollama_schema.py` có ca bẫy (19/11)
-- [ ] Ghi kết quả vào `evidence/FR-04/`, phiên bản Ollama + digest vào README
-- [ ] Chốt cách gọi LLM (`/v1` hay `/api/chat`, `reasoning_effort`) trong `config/m3.yaml`
+- [x] Ghi kết quả vào `evidence/FR-04/`, phiên bản Ollama + digest vào README (19/11)
+- [x] Chốt cách gọi LLM: `/v1` + `json_schema` + `reasoning_effort: none` (19/11)
 
 ### Ngày 2 — Cấu hình và dữ liệu
-- [ ] `tracewise/settings.py` + `config/m3.yaml`: thiếu `.env` thì báo lỗi rõ ràng
-- [ ] `tracewise/srs.py`: nạp dữ liệu của thầy, `check_host` (FR-07)
-- [ ] `tracewise/attack.py`: đọc STIX một chỗ duy nhất (691 kỹ thuật, 24 mã khớp tên)
-- [ ] Test cho cả ba module
+- [x] `tracewise/settings.py` + `config/m3.yaml` (theo quyết định B6): thiếu `.env` thì báo lỗi rõ ràng (19/11)
+- [x] `tracewise/srs.py`: nạp dữ liệu của thầy, `check_host` (FR-07) (19/11)
+- [x] `tracewise/attack.py`: đọc STIX một chỗ duy nhất (691 kỹ thuật, 24 mã khớp tên) (19/11)
+- [x] Test cho cả ba module (19/11)
 
 ### Ngày 2–3 — Kiểm tra chặt đầu ra
-- [ ] `tracewise/validate.py`: khuôn `Analysis` + 10 luật
-- [ ] `tests/test_validate.py` (45 test) + `data/packs/pack_760.json`
+- [x] `tracewise/validate.py`: khuôn `Analysis` + 10 luật (22/11)
+- [x] Thêm luật bắt mã trùng (B6: mô hình trả cùng một mã hai lần) — luật 6 có sẵn, nay gộp bằng chứng (22/11)
+- [x] `tests/test_validate.py` (45 test + test mã trùng) + `data/packs/pack_760.json` (22/11)
 
 ### Ngày 3 — Thiết kế
-- [ ] `docs/thiet_ke.md`: kiến trúc, quyết định + lý do, ERD, quyết định B6
-
+- [x] `docs/thiet_ke.md`: kiến trúc, quyết định + lý do, ERD, quyết định B6 (23/11)
 ### Ngày 3–4 — Rà nhãn (B7)
 - [ ] `data/srs/nhan_chuyen_gia_v1.csv` có cột `ma_chap_nhan` (file gốc giữ nguyên)
 - [ ] Biên bản thay đổi nhãn, kèm lý do từng dòng
@@ -55,6 +56,7 @@ Mốc HD: ngày 10 — bộ dữ liệu + bảng mã được duyệt, bảng t�
 - [ ] Gọi lại một lần khi JSON hỏng trong `pipeline.py` + test
 
 ### Ngày 8–9 — Chạy thật 35 cảnh báo (B1–B4)
+Lưu ý: mỗi cảnh báo ~2–3 phút trên CPU → mỗi cấu hình ~1–2 giờ; chạy lúc không dùng máy.
 - [ ] Lưu đầu ra thô + sau hậu kiểm
 - [ ] Chấm theo nhãn: tỷ lệ có ≥ 1 mã đúng, cờ chưa đủ căn cứ cho 2 cảnh báo hệ thống
 - [ ] Bảng 3 ca chèn prompt (đầu ra thô có bị lái không, sau kiểm có còn T9999/X0001 không)
@@ -71,6 +73,6 @@ Mốc HD: ngày 10 — bộ dữ liệu + bảng mã được duyệt, bảng t�
 ## Sau mốc ngày 10
 - [ ] Lab Wazuh 3 nguồn: lưu log thô, chuẩn hóa tên trường Wazuh, nối cảnh báo với log
 - [ ] `tracewise/evidence.py`: gói bằng chứng mức 1
-- [ ] Ma trận đánh giá (có/không RAG × 3 seed), khoảng tin cậy, McNemar, hit@k
+- [ ] Ma trận đánh giá (có/không RAG × seed) — giảm số lần chạy vì mỗi lần gọi ~1,5–2 phút
 - [ ] Giao diện React cho analyst
 - [ ] SRS theo ISO/IEC/IEEE 29148 bản đầy đủ
