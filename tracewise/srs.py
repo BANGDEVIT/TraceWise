@@ -8,6 +8,8 @@ from urllib.parse import (
 )  # tách một URL thành từng phần để đọc riêng: giao thức, tên máy, cổng, đường dẫn…
 
 import yaml
+from pydantic import BaseModel, ConfigDict, Field
+
 from .settings import ROOT
 
 SRS_DIR = ROOT / "data" / "srs"
@@ -31,6 +33,11 @@ def load_whitelist(path: Path = SRS_DIR / "attack_subset.csv") -> list[dict]:
             }
             for r in csv.DictReader(f)
         ]
+
+
+def whitelist_codes() -> list[str]:
+    """Chỉ danh sách 24 mã, theo thứ tự trong file của thầy."""
+    return [r["ma"] for r in load_whitelist()]
 
 
 # scenario_of gom nhãn về 17 nhóm độc lập: 15 kịch bản (tên nhóm là số rule, ví dụ "5710") + "INJ" + "khong_du"
@@ -57,6 +64,35 @@ def load_labels(path: Path = SRS_DIR / "nhan_chuyen_gia.csv") -> dict[str, dict]
                 "ghi_chu": r["ghi_chu"],
             }
     return labels
+
+
+def alert_lines(alert: dict, with_rule: bool = True, max_chars: int = 400) -> list[str]:
+    """Gói bằng chứng mức 0: tách một cảnh báo Wazuh thành các dòng (chưa đánh số E…).
+
+    with_rule=False bỏ dòng rule (dùng khi đo chèn prompt: rule của 3 ca INJ tự khai là bài thử).
+    """
+    lines = []
+    if with_rule:
+        r = alert["rule"]
+        lines.append(
+            f"rule {r['id']} (level {r['level']}): {r['description']}; "
+            f"groups: {', '.join(r.get('groups', []))}"
+        )
+    lines.append(f"agent: {alert['agent']['name']}")
+    lines.append(f"full_log: {alert['full_log']}")
+    for key, val in alert.get("data", {}).items():
+        lines.append(f"data.{key}: {val}")
+    return [line[:max_chars] for line in lines]
+
+
+class Assessment(BaseModel):
+    """Khuôn đầu ra của thầy: dùng khi chấm theo nhãn, không dùng bên trong TraceWise."""
+
+    model_config = ConfigDict(extra="forbid")
+    tom_tat: str = Field(min_length=20, max_length=600)
+    du_can_cu: bool
+    ma_attack: list[str] = Field(max_length=3)
+    bang_chung: list[str] = Field(min_length=1, max_length=6)
 
 
 # ---------- FR-07: chỉ gọi LLM ở host trong allowlist ----------
