@@ -1,11 +1,9 @@
-"""Bộ dữ liệu SRS-TTTN-M3 của thầy (cảnh báo, bảng mã, nhãn) và kiểm host LLM theo allowlist (FR-07)."""
+"""Bộ dữ liệu SRS-TTTN-M3 của thầy (cảnh báo, bảng mã, nhãn, khuôn đầu ra) và kiểm host LLM (FR-07)."""
 
 import csv
 import json
 from pathlib import Path
-from urllib.parse import (
-    urlparse,
-)  # tách một URL thành từng phần để đọc riêng: giao thức, tên máy, cổng, đường dẫn…
+from urllib.parse import urlparse
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
@@ -40,8 +38,6 @@ def whitelist_codes() -> list[str]:
     return [r["ma"] for r in load_whitelist()]
 
 
-# scenario_of gom nhãn về 17 nhóm độc lập: 15 kịch bản (tên nhóm là số rule, ví dụ "5710") + "INJ" + "khong_du"
-# Mỗi kịch bản có 2 cảnh báo gần giống hệt nhau. Khi tính khoảng tin cậy, phải lấy mẫu theo nhóm chứ không theo từng cảnh báo
 def scenario_of(note: str, du_can_cu: bool) -> str:
     """Nhóm độc lập của một nhãn: số rule của kịch bản, 'INJ' (chèn prompt) hoặc 'khong_du'."""
     if "CHÈN PROMPT" in note:
@@ -51,17 +47,39 @@ def scenario_of(note: str, du_can_cu: bool) -> str:
     return note.removeprefix("Kịch bản").strip()
 
 
-def load_labels(path: Path = SRS_DIR / "nhan_chuyen_gia.csv") -> dict[str, dict]:
-    """Nhãn chuyên gia theo alert_id: {"ma_attack": mã hoặc None, "du_can_cu": bool, "kich_ban", "ghi_chu"}."""
+LABELS_V0 = SRS_DIR / "nhan_chuyen_gia.csv"  # file gốc của thầy, không sửa
+LABELS_V1 = (
+    SRS_DIR / "nhan_chuyen_gia_v1.csv"
+)  # bản đã rà: thêm cột, không đổi nhãn gốc
+
+
+def _codes(cell: str | None) -> list[str]:
+    """'T1110;T1110.001' -> ['T1110', 'T1110.001']; ô trống -> []."""
+    return [c.strip() for c in (cell or "").split(";") if c.strip()]
+
+
+def load_labels(path: Path = LABELS_V0) -> dict[str, dict]:
+    """Nhãn theo alert_id.
+
+    Luôn có: "ma_attack" (mã hoặc None), "du_can_cu" (bool), "kich_ban", "ghi_chu".
+    Đọc bản đã rà (LABELS_V1) thì có thêm: "ma_chap_nhan" (mã đó + cha + con trong bảng 24 mã),
+    "ma_phu_de_xuat" (mã người rà đề xuất, CHƯA được duyệt), "trang_thai_ra_soat", "ly_do_ra_soat".
+    """
     labels = {}
     with open(path, encoding="utf-8", newline="") as f:
         for r in csv.DictReader(f):
             du = r["du_can_cu"].strip() == "co"
+            code = r["ma_attack_ky_vong"].strip() or None
             labels[r["alert_id"]] = {
-                "ma_attack": r["ma_attack_ky_vong"].strip() or None,
+                "ma_attack": code,
                 "du_can_cu": du,
                 "kich_ban": scenario_of(r["ghi_chu"], du),
                 "ghi_chu": r["ghi_chu"],
+                "ma_chap_nhan": _codes(r.get("ma_chap_nhan"))
+                or ([code] if code else []),
+                "ma_phu_de_xuat": _codes(r.get("ma_phu_de_xuat")),
+                "trang_thai_ra_soat": r.get("trang_thai_ra_soat") or None,
+                "ly_do_ra_soat": r.get("ly_do_ra_soat") or None,
             }
     return labels
 
