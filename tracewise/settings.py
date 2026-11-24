@@ -37,7 +37,9 @@ class LLMConf(Strict):
 class EmbedConf(Strict):
     base_url: str
     model: str
+    dim: int = Field(768, gt=0)
     query_prefix: str = ""
+    doc_template: str = "{text}"  # có thể dùng {title} và {text}
 
 
 class AnalysisConf(Strict):

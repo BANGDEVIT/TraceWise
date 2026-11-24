@@ -75,3 +75,48 @@ Mục mới nhất ở trên cùng. Mỗi mục: đã làm, quyết định (kè
 
 **Tiếp theo**
 - Ngày 3: `docs/thiet_ke.md`. Ngày 3–4: rà nhãn (B7).
+
+## Ngày 4 — 23/11/2026: rà nhãn chuyên gia (B7)
+
+**Đã làm**
+- Rà 35 nhãn: 22 đồng ý, 6 đề xuất thêm mã phụ, 7 cần bàn với thầy (LAB-0001/02, 0005/06, 0017/18, 0034).
+- `attack.family`: mã + cha + con (không gồm anh em).
+- `data/srs/ra_soat_nhan.csv` (ý kiến rà) → `scripts/build_labels_v1.py` → `data/srs/nhan_chuyen_gia_v1.csv`.
+- `docs/ra_soat_nhan.md`: biên bản gửi Hào và thầy duyệt.
+- 7 test mới → tổng 88 passed.
+
+**Quyết định**
+- Không sửa nhãn gốc; ba lớp: nhãn gốc / chấp nhận (tự động theo quy tắc) / đề xuất (chờ duyệt).
+- `ma_chap_nhan` chỉ tính trong 24 mã của bảng, vì TraceWise không trả được mã ngoài bảng.
+- File v1 sinh bằng script; test bảo đảm file khớp script và nhãn gốc không đổi.
+
+**Phát hiện**
+- Trong 24 mã, quan hệ cha–con chỉ có ở T1110 / T1110.001 → "chấp nhận được" chỉ khác "đúng mã" ở 5 cảnh báo.
+- Ba kịch bản có thể là hoạt động bình thường (đăng nhập thành công, sudo của quản trị viên, một lần đăng nhập sai) → cần thầy xác nhận ý đồ.
+
+**Tiếp theo**
+- Gửi biên bản cho Hào và thầy (kèm báo cáo tuần 1).
+- Ngày 4: `prompts.py`, `rag.py` + `scripts/setup_db.py`.
+
+## Ngày 5 — 24/11/2026: prompt và RAG
+
+**Đã làm**
+- `prompts/analyze_v1.md`: bảng tên kỹ thuật + 8 quy tắc rút từ lỗi thật ở B6; `summary_v1.md` cho câu truy vấn.
+- `tracewise/prompts.py`: SHA của prompt, thẻ ngẫu nhiên, gỡ thẻ giả, bảng kỹ thuật.
+- `tracewise/adapter.py` (phần embedding): kiểm FR-07 khi tạo client, lưu tên mô hình máy chủ trả về.
+- `tracewise/rag.py`: bảng `attack_kb`, tìm k ứng viên, lọc nền tảng, làm sạch câu truy vấn.
+- `scripts/setup_db.py`, `scripts/check_candidates.py`. 17 test mới → 105 passed.
+
+**Kết quả thật (EmbeddingGemma)**
+- setup_db: … giây cho 24 kỹ thuật.
+- Không lọc: hit@1 … | hit@3 … | hit@5 … | MRR …
+- Lọc nền tảng: hit@1 … | hit@3 … | hit@5 … | MRR …
+- Trượt khi lọc: …   (LAB-0029 có/không có T1003.001 trong top 5: …)
+
+**Quyết định**
+- System prompt cố định, bảng kỹ thuật đặt trong tin nhắn user (dùng lại phần đã tính trên CPU).
+- Khuôn tài liệu/truy vấn của EmbeddingGemma đưa vào cấu hình.
+- Không chỉnh câu truy vấn hay k theo kết quả trên bộ của thầy.
+
+**Tiếp theo**
+- Ngày 5: phần chat của adapter, `pipeline.py`, `store.py`, `api.py`; gọi thật LAB-0029.
