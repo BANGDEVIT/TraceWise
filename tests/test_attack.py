@@ -1,7 +1,7 @@
 """attack.py: đọc đúng ATT&CK 18.1 và 24 mã của thầy khớp tên, tactic."""
 
 from tracewise import srs
-from tracewise.attack import load_attack, tactic_slug
+from tracewise.attack import family, load_attack, tactic_slug
 
 
 def test_version_and_count():
@@ -42,3 +42,11 @@ def test_codes_from_newer_versions_are_absent():
 
 def test_loaded_once():
     assert load_attack()[0] is load_attack()[0]  # lần gọi sau dùng lại kết quả (cache)
+
+
+def test_family_is_self_parent_children_not_siblings():
+    table, _ = load_attack()
+    assert family("T1110.001", table) == {"T1110.001", "T1110"}
+    kids = family("T1110", table)
+    assert {"T1110", "T1110.001", "T1110.003"} <= kids
+    assert "T1110.003" not in family("T1110.001", table)  # anh em không được chấp nhận

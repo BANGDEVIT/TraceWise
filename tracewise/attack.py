@@ -108,3 +108,16 @@ def load_attack(path: str | Path | None = None) -> tuple[dict[str, Technique], s
 def tactic_slug(name: str) -> str:
     """'Command and Control' -> 'command-and-control' (cách viết tactic trong STIX)."""
     return name.strip().lower().replace(" ", "-")
+
+
+def family(code: str, table: dict[str, Technique]) -> set[str]:
+    """Mã đó + mã cha + các mã con (không gồm mã anh em).
+
+    T1110.001 -> {T1110.001, T1110};  T1110 -> {T1110, T1110.001, T1110.002, ...}.
+    Mã anh em (T1110.001 và T1110.003) là hai cách làm khác nhau nên không tính là chấp nhận được.
+    """
+    if "." in code:  # kỹ thuật con: thêm mã cha
+        return {code, code.split(".")[0]}
+    return {code} | {
+        c for c in table if c.startswith(code + ".")
+    }  # kỹ thuật cha: thêm các mã con
