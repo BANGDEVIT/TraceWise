@@ -32,12 +32,12 @@ Mốc HD: ngày 10 — bộ dữ liệu + bảng mã được duyệt, bảng t�
 ### Ngày 3 — Thiết kế
 - [x] `docs/thiet_ke.md`: kiến trúc, quyết định + lý do, ERD, quyết định B6 (23/11)
 ### Ngày 3–4 — Rà nhãn (B7)
-- [ ] `data/srs/nhan_chuyen_gia_v1.csv` có cột `ma_chap_nhan` (file gốc giữ nguyên)
-- [ ] Biên bản thay đổi nhãn, kèm lý do từng dòng
+- [x] `data/srs/nhan_chuyen_gia_v1.csv` có cột `ma_chap_nhan` (file gốc giữ nguyên) (23/11)
+- [x] Biên bản thay đổi nhãn, kèm lý do từng dòng — `docs/ra_soat_nhan.md`, chờ Hào/thầy duyệt (23/11)
 
 ### Ngày 4 — Prompt và RAG
-- [ ] `tracewise/prompts.py` + `prompts/analyze_v1.md`, `prompts/summary_v1.md`
-- [ ] `tracewise/rag.py` + `scripts/setup_db.py` (tạo `attack_kb`, embed 24 mã)
+- [x] `tracewise/prompts.py` + `prompts/analyze_v1.md`, `prompts/summary_v1.md` (24/11)
+- [x] `tracewise/rag.py` + `scripts/setup_db.py` (tạo `attack_kb`, embed 24 mã) (24/11)
 
 ### Ngày 5 — Dịch vụ
 - [ ] `tracewise/adapter.py`, `pipeline.py`, `store.py`, `api.py`
@@ -67,7 +67,7 @@ Lưu ý: mỗi cảnh báo ~2–3 phút trên CPU → mỗi cấu hình ~1–2 g
 - [ ] Điền `docs/truy_vet.csv`, `evidence/nghiem_thu.md`
 
 ### Ngày 10 — Mốc HD
-- [ ] Bộ dữ liệu + bảng mã được duyệt
+- [ ] Bộ dữ liệu + bảng mã được duyệt 
 - [ ] Báo cáo tuần 2, README cập nhật
 
 ## Sau mốc ngày 10

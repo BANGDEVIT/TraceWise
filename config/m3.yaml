@@ -1,4 +1,5 @@
-# Cấu hình TraceWise. Đổi mô hình hay máy chủ LLM: sửa file này, hoặc tạo file khác rồi trỏ biến môi trường M3_CONFIG tới nó. Không sửa code.
+# Cấu hình TraceWise. Đổi mô hình hay máy chủ LLM: sửa file này, hoặc tạo file khác
+# rồi trỏ biến môi trường M3_CONFIG tới nó. Không sửa code.
 
 llm: # máy chủ tương thích OpenAI (FR-LLM-01)
   base_url: http://localhost:11434/v1 # biến môi trường OLLAMA_HOST (nếu có) sẽ ghi đè
@@ -14,7 +15,9 @@ llm: # máy chủ tương thích OpenAI (FR-LLM-01)
 embed:
   base_url: http://localhost:11434/v1
   model: embeddinggemma
-  query_prefix: "task: search result | query: " # tiền tố truy vấn của EmbeddingGemma
+  dim: 768 # số chiều vector của embeddinggemma
+  query_prefix: "task: search result | query: " # EmbeddingGemma: tiền tố cho câu truy vấn
+  doc_template: "title: {title} | text: {text}" # EmbeddingGemma: khuôn cho tài liệu
 
 allowlist_file: data/srs/allowlist_llm.yaml # FR-07
 attack_stix: data/attack/enterprise-attack-18.1.json
