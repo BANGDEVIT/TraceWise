@@ -1,0 +1,20 @@
+{
+  "nguoi_luu": "bang",
+  "du_can_cu": true,
+  "ma_attack": [],
+  "detail": [
+    {
+      "type": "value_error",
+      "loc": ["body"],
+      "msg": "Value error, du_can_cu = true thì phải có ít nhất 1 mã; false thì ma_attack rỗng",
+      "input": {
+        "nguoi_luu": "bang",
+        "du_can_cu": true,
+        "ma_attack": []
+      },
+      "ctx": {
+        "error": {}
+      }
+    }
+  ]
+}

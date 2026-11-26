@@ -40,20 +40,26 @@ Mốc HD: ngày 10 — bộ dữ liệu + bảng mã được duyệt, bảng t�
 - [x] `tracewise/rag.py` + `scripts/setup_db.py` (tạo `attack_kb`, embed 24 mã) (24/11)
 
 ### Ngày 5 — Dịch vụ
-- [ ] `tracewise/adapter.py`, `pipeline.py`, `store.py`, `api.py`
-- [ ] `tests/test_api.py` (máy chủ LLM giả, schema `m3_test`)
-- [ ] Gọi thật `POST /alerts/LAB-0029/analysis` với Qwen
-- [ ] Báo cáo tuần 1 gửi thầy: khuôn đầu ra, kết quả B6, nhãn cần duyệt
+- [x] `tracewise/adapter.py`, `pipeline.py`, `store.py`, `api.py`
+- [x] `tests/test_api.py` (máy chủ LLM giả, schema `m3_test`)
+- [x] Gọi thật `POST /alerts/LAB-0029/analysis` với Qwen
+- [x] Báo cáo tuần 1 gửi thầy: khuôn đầu ra, kết quả B6, nhãn cần duyệt
 
 ## Tuần 2
 
-### Ngày 6–7 — FR-05 + FR-08
+### Ngày 6–7 — Nhãn analyst, nhật ký, gọi lại
+- [x] FR-05: bảng `analyst_label`, POST /runs/{id}/labels, GET /alerts/{id}/labels
+- [x] FR-08: `analysis_log` có `actor` (mã người lưu) và `model`; nâng cấp bảng cũ bằng ALTER TABLE
+- [x] B5: JSON hỏng gọi lại 1 lần, bị cắt thì gấp đôi max_tokens
+- [x] Luật 3: mỗi câu tóm tắt phải trích dòng E…; lưu tên thẻ ngẫu nhiên vào nhật ký
+
+<!-- ### Ngày 6–7 — FR-05 + FR-08
 - [ ] Bảng nhãn của analyst, tách khỏi nhãn mô hình; API lưu và xem
 - [ ] Nhật ký có "mã người lưu"
 - [ ] `tests/test_fr05.py`, bằng chứng trong `evidence/FR-05/`
 
 ### Ngày 7 — B5
-- [ ] Gọi lại một lần khi JSON hỏng trong `pipeline.py` + test
+- [ ] Gọi lại một lần khi JSON hỏng trong `pipeline.py` + test -->
 
 ### Ngày 8–9 — Chạy thật 35 cảnh báo (B1–B4)
 Lưu ý: mỗi cảnh báo ~2–3 phút trên CPU → mỗi cấu hình ~1–2 giờ; chạy lúc không dùng máy.
