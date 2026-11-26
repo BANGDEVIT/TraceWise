@@ -32,6 +32,9 @@ class LLMConf(Strict):
     timeout_s: float = Field(900, gt=0)
     response_format: Literal["json_schema", "json_object", "none"] = "json_schema"
     reasoning_effort: str | None = None
+    json_retries: int = Field(
+        1, ge=0, le=3
+    )  # B5: JSON hỏng thì gọi lại tối đa bấy nhiêu lần
 
 
 class EmbedConf(Strict):

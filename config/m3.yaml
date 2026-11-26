@@ -11,6 +11,7 @@ llm: # máy chủ tương thích OpenAI (FR-LLM-01)
   timeout_s: 900
   response_format: json_schema # B6: enum được áp qua /v1
   reasoning_effort: none # B6: bắt buộc; thiếu thì Qwen "suy nghĩ" và JSON bị cắt
+  json_retries: 1 # B5: JSON hỏng thì gọi lại 1 lần (bị cắt thì gấp đôi max_tokens)
 
 embed:
   base_url: http://localhost:11434/v1

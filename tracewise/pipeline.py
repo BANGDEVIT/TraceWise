@@ -4,6 +4,7 @@ Không ghi database ở đây (việc của store.py). analyze() trả về mộ
 kể cả khi máy chủ LLM lỗi (status "error"), để nhật ký vẫn ghi lại lần thử đó (FR-08).
 """
 
+import re
 import time
 import uuid
 from dataclasses import dataclass
@@ -17,6 +18,7 @@ from .attack import Technique, load_attack
 from .settings import Settings, load_settings
 
 SUMMARY_MAX_TOKENS = 120  # câu tóm tắt cho RAG chỉ 1–2 câu
+TAG = re.compile(r"<(alert-[0-9a-f]{6})>")  # tên thẻ ngẫu nhiên trong tin nhắn user
 
 
 @dataclass
@@ -25,7 +27,7 @@ class Services:
 
     settings: Settings
     client: OpenAICompatClient
-    conn: object
+    conn: object  # kết nối psycopg
     attack: dict[str, Technique]
     attack_version: str
 
@@ -93,15 +95,14 @@ def analyze(alert: dict, svc: Services) -> dict:
         "config": {},
         "prompt_tokens": None,
         "completion_tokens": None,
-        "latency_s": None,  # thời gian từ lúc gửi request tới Ollama cho tới lúc nhận đủ câu trả lời
+        "latency_s": None,
+        "attempts": 0,
         "events": [],
     }
     config = {
         "llm_model_requested": s.llm.model,
         "attack_version": svc.attack_version,
-        "settings": s.model_dump(
-            mode="json"
-        ),  # đổi object Pydantic thành dict chép toàn bộ cấu hình đang dùng vào báo cáo
+        "settings": s.model_dump(mode="json"),
     }
     t_start = time.perf_counter()
 
@@ -169,34 +170,53 @@ def analyze(alert: dict, svc: Services) -> dict:
             )
         run["candidates"] = codes
 
-        # 3. LLM phân tích, enum = ứng viên
-        t0 = time.perf_counter()
-        msgs, sha = prompts.analysis_messages(
-            pack, codes, svc.attack, s.analysis.prompt
-        )
-        reply = svc.client.chat(msgs, validate.output_schema(codes, list(pack)))
-        run["raw"] = reply.content
-        run["prompt_tokens"], run["completion_tokens"] = (
-            reply.prompt_tokens,
-            reply.completion_tokens,
-        )
-        config.update(
-            prompt=s.analysis.prompt, prompt_sha=sha, llm_model_served=reply.model
-        )
-        event(
-            "llm",
-            t0,
-            model=reply.model,
-            finish_reason=reply.finish_reason,
-            prompt_tokens=reply.prompt_tokens,
-            completion_tokens=reply.completion_tokens,
-        )
+        # 3. LLM phân tích, enum = ứng viên. JSON hỏng thì gọi lại (B5), bị cắt thì gấp đôi max_tokens
+        schema = validate.output_schema(codes, list(pack))
+        ctx = validate.make_context(pack, codes, svc.attack)
+        max_tokens = s.llm.max_tokens
+        for attempt in range(1, s.llm.json_retries + 2):
+            t0 = time.perf_counter()
+            msgs, sha = prompts.analysis_messages(
+                pack, codes, svc.attack, s.analysis.prompt
+            )
+            reply = svc.client.chat(msgs, schema, max_tokens=max_tokens)
+            run["raw"], run["attempts"] = reply.content, attempt
+            run["prompt_tokens"] = (run["prompt_tokens"] or 0) + (
+                reply.prompt_tokens or 0
+            )
+            run["completion_tokens"] = (run["completion_tokens"] or 0) + (
+                reply.completion_tokens or 0
+            )
+            config.update(
+                prompt=s.analysis.prompt, prompt_sha=sha, llm_model_served=reply.model
+            )
+            event(
+                "llm",
+                t0,
+                attempt=attempt,
+                tag=TAG.search(msgs[1]["content"]).group(1),
+                model=reply.model,
+                finish_reason=reply.finish_reason,
+                max_tokens=max_tokens,
+                prompt_tokens=reply.prompt_tokens,
+                completion_tokens=reply.completion_tokens,
+            )
 
-        # 4. 10 luật
-        t0 = time.perf_counter()
-        report = validate.validate(
-            reply.content, validate.make_context(pack, codes, svc.attack)
-        )
+            # 4. 10 luật
+            t0 = time.perf_counter()
+            report = validate.validate(reply.content, ctx)
+            if report["valid"] or attempt > s.llm.json_retries:
+                break
+            if reply.finish_reason == "length":
+                max_tokens *= 2
+            event(
+                "retry",
+                t0,
+                reason=report["violations"][0]["detail"],
+                raw=reply.content[:500],
+                next_max_tokens=max_tokens,
+            )
+
         run.update(
             status="ok" if report["valid"] else "invalid",
             needs_review=report["needs_review"],
