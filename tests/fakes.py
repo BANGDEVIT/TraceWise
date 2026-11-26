@@ -42,8 +42,8 @@ def first_candidate_answer(body):
 
 
 class FakeLLM:
-    """replies: mỗi lần gọi chat lấy một phần tử: chuỗi (nội dung), hàm(body) -> chuỗi, hoặc httpx.Response.
-    Hết danh sách thì trả first_candidate_answer."""
+    """replies: mỗi lần gọi chat lấy một phần tử: chuỗi (nội dung), hàm(body) -> chuỗi, httpx.Response,
+    hoặc bộ (nội dung, finish_reason) để giả câu trả lời bị cắt. Hết danh sách thì trả first_candidate_answer."""
 
     def __init__(self, *replies):
         self.replies = list(replies)
@@ -66,7 +66,8 @@ class FakeLLM:
         reply = self.replies.pop(0) if self.replies else first_candidate_answer
         if isinstance(reply, httpx.Response):
             return reply
-        content = reply(body) if callable(reply) else reply
+        content, finish = reply if isinstance(reply, tuple) else (reply, "stop")
+        content = content(body) if callable(content) else content
         return httpx.Response(
             200,
             json={
@@ -74,7 +75,7 @@ class FakeLLM:
                 "choices": [
                     {
                         "index": 0,
-                        "finish_reason": "stop",
+                        "finish_reason": finish,
                         "message": {"role": "assistant", "content": content},
                     }
                 ],
