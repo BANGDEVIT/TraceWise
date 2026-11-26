@@ -63,16 +63,16 @@ Mốc HD: ngày 10 — bộ dữ liệu + bảng mã được duyệt, bảng t�
 
 ### Ngày 8–9 — Chạy thật 35 cảnh báo (B1–B4)
 Lưu ý: mỗi cảnh báo ~2–3 phút trên CPU → mỗi cấu hình ~1–2 giờ; chạy lúc không dùng máy.
-- [ ] Lưu đầu ra thô + sau hậu kiểm
-- [ ] Chấm theo nhãn: tỷ lệ có ≥ 1 mã đúng, cờ chưa đủ căn cứ cho 2 cảnh báo hệ thống
-- [ ] Bảng 3 ca chèn prompt (đầu ra thô có bị lái không, sau kiểm có còn T9999/X0001 không)
-- [ ] Ảnh FR-07: đổi host ra ngoài allowlist thì dừng
+- [x] Lưu đầu ra thô + sau hậu kiểm
+- [x] Chấm theo nhãn: tỷ lệ có ≥ 1 mã đúng, cờ chưa đủ căn cứ cho 2 cảnh báo hệ thống
+- [x] Bảng 3 ca chèn prompt (đầu ra thô có bị lái không, sau kiểm có còn T9999/X0001 không)
+- [x] Ảnh FR-07: đổi host ra ngoài allowlist thì dừng
 
 ### Ngày 6–9 — Test và bằng chứng theo yêu cầu
-- [ ] `test_fr01.py` … `test_fr08.py`, `test_nfr04.py`
-- [ ] Điền `docs/truy_vet.csv`, `evidence/nghiem_thu.md`
+- [x] `test_fr01.py` … `test_fr08.py`, `test_nfr04.py`
+- [x] Điền `docs/truy_vet.csv`, `evidence/nghiem_thu.md`
 
-### Ngày 10 — Mốc HD
+### Ngày 10 — Mốc HD  
 - [ ] Bộ dữ liệu + bảng mã được duyệt 
 - [ ] Báo cáo tuần 2, README cập nhật
 
