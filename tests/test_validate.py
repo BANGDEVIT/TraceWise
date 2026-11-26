@@ -415,3 +415,55 @@ def test_to_teacher_without_codes_keeps_summary_citations():
 
 def test_to_teacher_invalid_output_is_none():
     assert va.to_teacher(run('{"verdict": "suspicious"')) is None
+
+
+# Đầu ra THẬT của Qwen cho LAB-0029 (25/11/2026, evidence/runs/LAB-0029_run1.json):
+# câu 2 trích [T1003.001] thay vì mã dòng, câu 3 không trích gì. Ngày 5 lọt qua 10 luật.
+LAB29_PACK = {
+    "E1": "rule 100400 (level 12): Access to lsass process memory; groups: windows, sysmon",
+    "E2": "agent: lab-win02",
+    "E3": (
+        "full_log: SourceImage: C:\\Users\\Public\\p.exe TargetImage: "
+        "C:\\Windows\\System32\\lsass.exe GrantedAccess: 0x1010"
+    ),
+}
+LAB29_RAW = json.dumps(
+    {
+        "verdict": "suspicious",
+        "summary": (
+            "Có bằng chứng truy cập bộ nhớ LSASS từ một file không rõ nguồn gốc [E3]. "
+            "Hành động này phù hợp với kỹ thuật lấy thông tin đăng nhập [T1003.001]. "
+            "Không có dấu hiệu của các kỹ thuật khác trong dữ liệu hiện có."
+        ),
+        "techniques": [
+            {
+                "id": "T1003.001",
+                "rank": 1,
+                "evidence": ["E3"],
+                "reason": "Dữ liệu cho thấy truy cập bộ nhớ LSASS từ một file target không phải là hệ thống.",
+            }
+        ],
+        "confidence": 0.95,
+        "insufficient_evidence": False,
+    },
+    ensure_ascii=False,
+)
+
+
+def test_r3_lab0029_real_output_flags_uncited_sentences():
+    cands = ["T1003.001", "T1547.001", "T1070.001", "T1082", "T1136.001"]
+    report = va.validate(LAB29_RAW, va.make_context(LAB29_PACK, cands, ATTACK))
+    assert report["violations"] == [
+        {
+            "rule": "R3",
+            "action": "can_xem",
+            "detail": "câu [2, 3] trong summary (trên 3 câu) không trích dòng E…",
+        }
+    ]
+    assert (
+        report["needs_review"]
+        and report["result"]["techniques"][0]["id"] == "T1003.001"
+    )
+    assert (
+        report["result"]["confidence"] == 0.95
+    )  # chỉ đánh dấu cần xem, không hạ tin cậy

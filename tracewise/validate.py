@@ -147,10 +147,11 @@ EVIDENCE_ID = re.compile(
 
 
 def r3_real_evidence(res, ctx):
-    """Mọi mã trong evidence và mọi [E…] trong summary phải có trong gói.
+    """Mọi mã trong evidence và mọi [E…] trong summary phải có trong gói; mỗi câu summary phải trích.
 
     B6: mô hình có thể chép nguyên dòng "[E1] 2026-11-18 ..." vào evidence. Nếu đầu chuỗi là
     một mã E… thì chỉ giữ mã đó (sửa định dạng, không hạ tin cậy); mã không có trong gói thì bỏ.
+    Câu không trích dòng E… nào: đánh dấu cần người xem, không hạ tin cậy (lỗi trình bày, không phải bịa).
     """
     fixed, out = [], []
     for t in res["techniques"]:
@@ -183,6 +184,17 @@ def r3_real_evidence(res, ctx):
     if fixed:
         out.append(
             _v("R3", f"evidence sai định dạng, chỉ giữ mã E…: {len(fixed)} mục", "sua")
+        )
+    sentences = [s for s in SENTENCE_END.split(res["summary"].strip()) if s]
+    uncited = [i + 1 for i, s in enumerate(sentences) if not CITE.search(s)]
+    if uncited:  # LAB-0029 : câu 2 trích [T1003.001], câu 3 không trích gì
+        out.append(
+            _v(
+                "R3",
+                f"câu {uncited} trong summary (trên {len(sentences)} câu) "
+                "không trích dòng E…",
+                "can_xem",
+            )
         )
     return out
 
