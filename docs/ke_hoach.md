@@ -72,9 +72,11 @@ Lưu ý: mỗi cảnh báo ~2–3 phút trên CPU → mỗi cấu hình ~1–2 g
 - [x] `test_fr01.py` … `test_fr08.py`, `test_nfr04.py`
 - [x] Điền `docs/truy_vet.csv`, `evidence/nghiem_thu.md`
 
-### Ngày 10 — Mốc HD  
-- [ ] Bộ dữ liệu + bảng mã được duyệt 
-- [ ] Báo cáo tuần 2, README cập nhật
+### Ngày 10 — Mốc
+- [x] Báo cáo mốc `docs/bao_cao/Bao_cao_moc_TraceWise.docx`
+- [x] Kịch bản demo `docs/demo_moc.md`
+- [x] Tag `v0.1.0`
+- [ ] Gửi báo cáo cho thầy; demo; ghi lại ý kiến thầy vào `docs/nhat_ky.md`
 
 ## Sau mốc ngày 10
 - [ ] Lab Wazuh 3 nguồn: lưu log thô, chuẩn hóa tên trường Wazuh, nối cảnh báo với log
@@ -82,3 +84,13 @@ Lưu ý: mỗi cảnh báo ~2–3 phút trên CPU → mỗi cấu hình ~1–2 g
 - [ ] Ma trận đánh giá (có/không RAG × seed) — giảm số lần chạy vì mỗi lần gọi ~1,5–2 phút
 - [ ] Giao diện React cho analyst
 - [ ] SRS theo ISO/IEC/IEEE 29148 bản đầy đủ
+
+## Sau mốc (thứ tự ưu tiên chờ thầy cho ý kiến)
+- [ ] Giới hạn thời gian tổng mỗi lần gọi Qwen; tìm nguyên nhân LAB-0004, 0012 chờ ~1 giờ
+- [ ] Sửa nhãn v1 theo trả lời của thầy cho 4 câu hỏi; chấm lại lab35_a (không chạy lại Qwen)
+- [ ] Tập phát triển riêng (không dùng 35 cảnh báo của thầy) để thử prompt, k, query_mode summary
+- [ ] Lab Wazuh 3 nguồn (Sysmon, Windows Security, PowerShell); gói bằng chứng mức 1
+- [ ] Giao diện React: xem kết quả, lưu nhãn, đăng nhập (nguoi_luu lấy từ tài khoản)
+- [ ] SRS theo ISO/IEC/IEEE 29148; nhờ Hào chấm tay độc lập 10 tóm tắt
+
+
