@@ -120,3 +120,23 @@ Mục mới nhất ở trên cùng. Mỗi mục: đã làm, quyết định (kè
 
 **Tiếp theo**
 - Ngày 5: phần chat của adapter, `pipeline.py`, `store.py`, `api.py`; gọi thật LAB-0029.
+
+## …/11/2026 — Kế hoạch Ngày 6–7: nhãn analyst, nhật ký, gọi lại
+
+**Đã làm**
+- FR-05: nhãn analyst ở bảng riêng `analyst_label`, chỉ thêm không sửa, nối với lần chạy (run_id).
+- FR-08: mỗi dòng nhật ký có alert_ref, model, actor, ts; dòng cũ được điền model.
+- B5: gọi lại khi JSON hỏng; bị cắt thì 800 → 1600 token.
+- Luật 3 bắt câu tóm tắt không trích dẫn (lỗi thật của LAB-0029 ngày 25/11). 15 test mới → 139 passed.
+
+**Kết quả thật**
+- LAB-0029 chạy lại: trạng thái …, cần người xem …, gọi Qwen … lần, vi phạm …
+- Lưu nhãn qua /docs: 201; nhãn sai: 422.
+
+**Quyết định**
+- Mã analyst được kiểm trong 691 kỹ thuật ATT&CK 18.1, không giới hạn trong 5 ứng viên.
+- Câu không trích dẫn: đánh dấu cần xem, không hạ tin cậy.
+- Chưa có đăng nhập: nguoi_luu gõ tay; sẽ lấy từ tài khoản khi có giao diện.
+
+**Tiếp theo**
+- Ngày 8–9: chạy thật 35 cảnh báo, chấm theo nhãn, báo cáo 3 ca chèn lệnh.

@@ -1,0 +1,265 @@
+{
+  "id": 3,
+  "created_at": "2026-11-26T02:40:02.549368+00:00",
+  "request_id": "1e200e93c9fb4b98b627f076095f9d99",
+  "alert_ref": "LAB-0029",
+  "host": "lab-win02",
+  "status": "ok",
+  "needs_review": true,
+  "error": null,
+  "raw": "{\n  \"verdict\": \"suspicious\",\n  \"summary\": \"Có bằng chứng truy cập bộ nhớ LSASS qua file .exe, [E3]. Hành vi này phù hợp với kỹ thuật T1003.001.\",\n  \"techniques\": [\n    {\n      \"id\": \"T1003.001\",\n      \"rank\": 1,\n      \"evidence\": [\"E3\"],\"reason\": \"Dữ liệu cho thấy truy cập bộ nhớ LSASS qua file .exe.\"\n    }\n  ],\n  \"confidence\": 0.95,\n  \"insufficient_evidence\": false\n}",
+  "result": {
+    "summary": "Có bằng chứng truy cập bộ nhớ LSASS qua file .exe, [E3]. Hành vi này phù hợp với kỹ thuật T1003.001.",
+    "verdict": "suspicious",
+    "confidence": 0.95,
+    "techniques": [
+      {
+        "id": "T1003.001",
+        "name": "LSASS Memory",
+        "rank": 1,
+        "reason": "Dữ liệu cho thấy truy cập bộ nhớ LSASS qua file .exe.",
+        "tactics": [
+          "credential-access"
+        ],
+        "evidence": [
+          "E3"
+        ]
+      }
+    ],
+    "insufficient_evidence": false
+  },
+  "teacher": {
+    "tom_tat": "Có bằng chứng truy cập bộ nhớ LSASS qua file .exe, [E3]. Hành vi này phù hợp với kỹ thuật T1003.001.",
+    "du_can_cu": true,
+    "ma_attack": [
+      "T1003.001"
+    ],
+    "bang_chung": [
+      "E3"
+    ]
+  },
+  "violations": [
+    {
+      "rule": "R3",
+      "action": "can_xem",
+      "detail": "câu [2] trong summary (trên 2 câu) không trích dòng E…"
+    }
+  ],
+  "pack": {
+    "E1": "rule 100400 (level 12): Access to lsass process memory; groups: windows, sysmon",
+    "E2": "agent: lab-win02",
+    "E3": "full_log: SourceImage: C:\\Users\\Public\\p.exe TargetImage: C:\\Windows\\System32\\lsass.exe GrantedAccess: 0x1010"
+  },
+  "candidates": [
+    "T1003.001",
+    "T1547.001",
+    "T1070.001",
+    "T1082",
+    "T1136.001"
+  ],
+  "config": {
+    "prompt": "analyze_v1",
+    "settings": {
+      "db": {
+        "dsn_env": "M3_PG_DSN"
+      },
+      "llm": {
+        "seed": 42,
+        "model": "qwen3.5:4b",
+        "base_url": "http://localhost:11434/v1",
+        "timeout_s": 900,
+        "max_tokens": 800,
+        "api_key_env": "M3_LLM_API_KEY",
+        "temperature": 0,
+        "json_retries": 1,
+        "response_format": "json_schema",
+        "reasoning_effort": "none"
+      },
+      "embed": {
+        "dim": 768,
+        "model": "embeddinggemma",
+        "base_url": "http://localhost:11434/v1",
+        "doc_template": "title: {title} | text: {text}",
+        "query_prefix": "task: search result | query: "
+      },
+      "analysis": {
+        "k": 5,
+        "rag": true,
+        "prompt": "analyze_v1",
+        "query_mode": "pack",
+        "summary_prompt": "summary_v1",
+        "platform_filter": true
+      },
+      "attack_stix": "D:\\DEV\\github project\\TraceWise\\data\\attack\\enterprise-attack-18.1.json",
+      "host_platform": {
+        "lab-db01": "Linux",
+        "lab-web01": "Linux",
+        "lab-win02": "Windows"
+      },
+      "allowlist_file": "D:\\DEV\\github project\\TraceWise\\data\\srs\\allowlist_llm.yaml"
+    },
+    "prompt_sha": "bac430a05cd9",
+    "attack_version": "18.1",
+    "llm_model_served": "qwen3.5:4b",
+    "embed_model_served": "embeddinggemma",
+    "llm_model_requested": "qwen3.5:4b"
+  },
+  "prompt_tokens": 645,
+  "completion_tokens": 147,
+  "latency_s": 70.36,
+  "attempts": 1,
+  "events": [
+    {
+      "ts": "2026-11-26T02:38:52.193000+00:00",
+      "event": "pack",
+      "actor": "tracewise",
+      "model": "qwen3.5:4b",
+      "detail": {
+        "level": 0,
+        "lines": 3,
+        "seconds": 0
+      }
+    },
+    {
+      "ts": "2026-11-26T02:38:56.775000+00:00",
+      "event": "candidates",
+      "actor": "tracewise",
+      "model": "qwen3.5:4b",
+      "detail": {
+        "found": [
+          {
+            "ma": "T1003.001",
+            "do_giong": 0.6054
+          },
+          {
+            "ma": "T1547.001",
+            "do_giong": 0.4103
+          },
+          {
+            "ma": "T1070.001",
+            "do_giong": 0.3737
+          },
+          {
+            "ma": "T1082",
+            "do_giong": 0.3534
+          },
+          {
+            "ma": "T1136.001",
+            "do_giong": 0.3474
+          }
+        ],
+        "query": "rule 100400 (level 12): Access to lsass process memory; groups: windows, sysmon\nfull log: SourceImage: C:\\Users\\Public\\p.exe TargetImage: C:\\Windows\\System32\\lsass.exe GrantedAccess: 0x1010",
+        "seconds": 4.582,
+        "platform": "Windows"
+      }
+    },
+    {
+      "ts": "2026-11-26T02:40:02.545000+00:00",
+      "event": "llm",
+      "actor": "tracewise",
+      "model": "qwen3.5:4b",
+      "detail": {
+        "tag": "alert-702f14",
+        "model": "qwen3.5:4b",
+        "attempt": 1,
+        "seconds": 65.763,
+        "max_tokens": 800,
+        "finish_reason": "stop",
+        "prompt_tokens": 645,
+        "completion_tokens": 147
+      }
+    },
+    {
+      "ts": "2026-11-26T02:40:02.549000+00:00",
+      "event": "validate",
+      "actor": "tracewise",
+      "model": "qwen3.5:4b",
+      "detail": {
+        "valid": true,
+        "seconds": 0.005,
+        "violations": 1,
+        "needs_review": true
+      }
+    },
+    {
+      "ts": "2026-11-26T02:46:22.945034+00:00",
+      "event": "label_saved",
+      "actor": "bang",
+      "model": "qwen3.5:4b",
+      "detail": {
+        "run_id": 3,
+        "label_id": 1,
+        "du_can_cu": true,
+        "ma_attack": [
+          "T1003.001"
+        ]
+      }
+    },
+    {
+      "ts": "2026-11-26T02:46:59.233941+00:00",
+      "event": "label_saved",
+      "actor": "bang",
+      "model": "qwen3.5:4b",
+      "detail": {
+        "run_id": 3,
+        "label_id": 2,
+        "du_can_cu": true,
+        "ma_attack": [
+          "T1003.001"
+        ]
+      }
+    },
+    {
+      "ts": "2026-11-26T09:07:13.376532+00:00",
+      "event": "label_saved",
+      "actor": "bang",
+      "model": "qwen3.5:4b",
+      "detail": {
+        "run_id": 3,
+        "label_id": 3,
+        "du_can_cu": true,
+        "ma_attack": [
+          "T1003.001"
+        ]
+      }
+    }
+  ],
+  "labels": [
+    {
+      "id": 3,
+      "created_at": "2026-11-26T09:07:13.376532+00:00",
+      "run_id": 3,
+      "alert_ref": "LAB-0029",
+      "nguoi_luu": "bang",
+      "du_can_cu": true,
+      "ma_attack": [
+        "T1003.001"
+      ],
+      "ghi_chu": ""
+    },
+    {
+      "id": 2,
+      "created_at": "2026-11-26T02:46:59.233941+00:00",
+      "run_id": 3,
+      "alert_ref": "LAB-0029",
+      "nguoi_luu": "bang",
+      "du_can_cu": true,
+      "ma_attack": [
+        "T1003.001"
+      ],
+      "ghi_chu": ""
+    },
+    {
+      "id": 1,
+      "created_at": "2026-11-26T02:46:22.945034+00:00",
+      "run_id": 3,
+      "alert_ref": "LAB-0029",
+      "nguoi_luu": "bang",
+      "du_can_cu": true,
+      "ma_attack": [
+        "T1003.001"
+      ],
+      "ghi_chu": ""
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "request_id": "4adda2fb36d7472499086c03ab1d95ca",
+  "alert_ref": "LAB-0029",
+  "host": "lab-win02",
+  "status": "ok",
+  "needs_review": false,
+  "error": null,
+  "raw": "{\n  \"verdict\": \"suspicious\",\n  \"summary\": \"Có bằng chứng truy cập bộ nhớ LSASS từ một file không rõ nguồn gốc [E3]. Hành vi này phù hợp với kỹ thuật lấy thông tin đăng nhập [T1003.001]. Không có dấu hiệu của các kỹ thuật khác trong dữ liệu hiện có.\",\n  \"techniques\": [\n    {\n      \"id\": \"T1003.001\",\n      \"rank\": 1,\n      \"evidence\": [\"E3\"],\"reason\": \"Dữ liệu cho thấy truy cập bộ nhớ LSASS từ một file target không phải là hệ thống.\"\n    }\n  ],\n  \"confidence\": 0.95,\n  \"insufficient_evidence\": false\n}",
+  "result": {
+    "verdict": "suspicious",
+    "summary": "Có bằng chứng truy cập bộ nhớ LSASS từ một file không rõ nguồn gốc [E3]. Hành vi này phù hợp với kỹ thuật lấy thông tin đăng nhập [T1003.001]. Không có dấu hiệu của các kỹ thuật khác trong dữ liệu hiện có.",
+    "techniques": [
+      {
+        "id": "T1003.001",
+        "rank": 1,
+        "evidence": [
+          "E3"
+        ],
+        "reason": "Dữ liệu cho thấy truy cập bộ nhớ LSASS từ một file target không phải là hệ thống.",
+        "name": "LSASS Memory",
+        "tactics": [
+          "credential-access"
+        ]
+      }
+    ],
+    "confidence": 0.95,
+    "insufficient_evidence": false
+  },
+  "teacher": {
+    "tom_tat": "Có bằng chứng truy cập bộ nhớ LSASS từ một file không rõ nguồn gốc [E3]. Hành vi này phù hợp với kỹ thuật lấy thông tin đăng nhập [T1003.001]. Không có dấu hiệu của các kỹ thuật khác trong dữ liệu hiện có.",
+    "du_can_cu": true,
+    "ma_attack": [
+      "T1003.001"
+    ],
+    "bang_chung": [
+      "E3"
+    ]
+  },
+  "violations": [],
+  "pack": {
+    "E1": "rule 100400 (level 12): Access to lsass process memory; groups: windows, sysmon",
+    "E2": "agent: lab-win02",
+    "E3": "full_log: SourceImage: C:\\Users\\Public\\p.exe TargetImage: C:\\Windows\\System32\\lsass.exe GrantedAccess: 0x1010"
+  },
+  "candidates": [
+    "T1003.001",
+    "T1547.001",
+    "T1070.001",
+    "T1082",
+    "T1136.001"
+  ],
+  "config": {
+    "llm_model_requested": "qwen3.5:4b",
+    "attack_version": "18.1",
+    "settings": {
+      "llm": {
+        "base_url": "http://localhost:11434/v1",
+        "model": "qwen3.5:4b",
+        "api_key_env": "M3_LLM_API_KEY",
+        "temperature": 0.0,
+        "seed": 42,
+        "max_tokens": 800,
+        "timeout_s": 900.0,
+        "response_format": "json_schema",
+        "reasoning_effort": "none"
+      },
+      "embed": {
+        "base_url": "http://localhost:11434/v1",
+        "model": "embeddinggemma",
+        "dim": 768,
+        "query_prefix": "task: search result | query: ",
+        "doc_template": "title: {title} | text: {text}"
+      },
+      "allowlist_file": "D:\\DEV\\github project\\TraceWise\\data\\srs\\allowlist_llm.yaml",
+      "attack_stix": "D:\\DEV\\github project\\TraceWise\\data\\attack\\enterprise-attack-18.1.json",
+      "analysis": {
+        "prompt": "analyze_v1",
+        "summary_prompt": "summary_v1",
+        "rag": true,
+        "k": 5,
+        "platform_filter": true,
+        "query_mode": "pack"
+      },
+      "host_platform": {
+        "lab-win02": "Windows",
+        "lab-web01": "Linux",
+        "lab-db01": "Linux"
+      },
+      "db": {
+        "dsn_env": "M3_PG_DSN"
+      }
+    },
+    "embed_model_served": "embeddinggemma",
+    "prompt": "analyze_v1",
+    "prompt_sha": "bac430a05cd9",
+    "llm_model_served": "qwen3.5:4b"
+  },
+  "prompt_tokens": 642,
+  "completion_tokens": 175,
+  "latency_s": 71.69,
+  "events": [
+    {
+      "ts": "2026-11-25T06:29:52.340+00:00",
+      "event": "pack",
+      "detail": {
+        "seconds": 0.0,
+        "level": 0,
+        "lines": 3
+      }
+    },
+    {
+      "ts": "2026-11-25T06:29:56.516+00:00",
+      "event": "candidates",
+      "detail": {
+        "seconds": 4.176,
+        "query": "rule 100400 (level 12): Access to lsass process memory; groups: windows, sysmon\nfull log: SourceImage: C:\\Users\\Public\\p.exe TargetImage: C:\\Windows\\System32\\lsass.exe GrantedAccess: 0x1010",
+        "platform": "Windows",
+        "found": [
+          {
+            "ma": "T1003.001",
+            "do_giong": 0.6054
+          },
+          {
+            "ma": "T1547.001",
+            "do_giong": 0.4103
+          },
+          {
+            "ma": "T1070.001",
+            "do_giong": 0.3737
+          },
+          {
+            "ma": "T1082",
+            "do_giong": 0.3534
+          },
+          {
+            "ma": "T1136.001",
+            "do_giong": 0.3474
+          }
+        ]
+      }
+    },
+    {
+      "ts": "2026-11-25T06:31:04.025+00:00",
+      "event": "llm",
+      "detail": {
+        "seconds": 67.509,
+        "model": "qwen3.5:4b",
+        "finish_reason": "stop",
+        "prompt_tokens": 642,
+        "completion_tokens": 175
+      }
+    },
+    {
+      "ts": "2026-11-25T06:31:04.032+00:00",
+      "event": "validate",
+      "detail": {
+        "seconds": 0.007,
+        "valid": true,
+        "violations": 0,
+        "needs_review": false
+      }
+    }
+  ]
+}
