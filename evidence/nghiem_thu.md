@@ -1,6 +1,6 @@
 # Biên bản nghiệm thu TraceWise — mốc 2 tuần
 
-Ngày: 26/11/2026 | Commit: `…` (sau khi commit, lấy bằng `git rev-parse --short HEAD`)
+Ngày: 26/11/2026 | Commit: 8aa13cd (sau khi commit, lấy bằng `git rev-parse --short HEAD`)
 Mô hình: qwen3.5:4b (Ollama 0.40.16) | Embedding: embeddinggemma | ATT&CK: 18.1
 Prompt: analyze_v1, prompt_sha `bac430a05cd9` | Lượt chạy: `lab35_a` (k = 5, lọc nền tảng bật, query_mode pack)
 Test: 228 passed; test nghiệm thu 79 passed (`evidence/nghiem_thu_pytest.txt`)
