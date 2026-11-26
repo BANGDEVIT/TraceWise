@@ -1,9 +1,11 @@
 """adapter.chat + pipeline.analyze + store: chạy trọn một cảnh báo với LLM giả và Postgres thật."""
 
 import json
-
 import httpx
+import psycopg
 import pytest
+# import httpx
+# import pytest
 
 from tests.fakes import FakeLLM
 from tracewise import pipeline, prompts, srs, store
@@ -148,10 +150,62 @@ def test_lab0033_injection_kept_out_of_query_and_result(db):
     assert r["result"]["confidence"] <= 0.5
 
 
-def test_broken_json_is_invalid_and_raw_is_kept(db):
-    r = run("LAB-0029", FakeLLM('{"verdict": "suspicious", "summary": "Tiến trình'), db)
+BROKEN = '{"verdict": "suspicious", "summary": "Tiến trình'  # JSON bị cắt giữa chừng
+
+
+def test_broken_json_is_retried_once_and_recovers(db):
+    fake = FakeLLM(BROKEN)  # lần 1 hỏng, lần 2 trả lời đúng
+    r = run("LAB-0029", fake, db)
+    assert r["status"] == "ok" and r["attempts"] == 2 and len(fake.chats()) == 2
+    assert [e["event"] for e in r["events"]] == [
+        "pack",
+        "candidates",
+        "llm",
+        "retry",
+        "llm",
+        "validate",
+    ]
+    assert r["events"][3]["detail"]["raw"] == BROKEN
+    assert (r["prompt_tokens"], r["completion_tokens"]) == (
+        1800,
+        240,
+    )  # cộng cả hai lần gọi
+
+
+def test_broken_twice_is_invalid_and_raw_is_kept(db):
+    fake = FakeLLM(BROKEN, BROKEN)
+    r = run("LAB-0029", fake, db)
     assert r["status"] == "invalid" and r["result"] is None and r["teacher"] is None
-    assert r["raw"].startswith('{"verdict"') and r["violations"][0]["rule"] == "R1"
+    assert r["attempts"] == 2 and len(fake.chats()) == 2  # gọi lại đúng một lần
+    assert r["raw"] == BROKEN and r["violations"][0]["rule"] == "R1"
+
+
+def test_truncated_reply_retries_with_double_max_tokens(db):
+    fake = FakeLLM((BROKEN, "length"))
+    r = run("LAB-0029", fake, db)
+    first, second = fake.chats()
+    assert (first["max_tokens"], second["max_tokens"]) == (800, 1600) and r[
+        "status"
+    ] == "ok"
+    assert r["events"][2]["detail"]["finish_reason"] == "length"
+
+
+def test_no_retry_when_disabled(db):
+    fake = FakeLLM(BROKEN)
+    no_retry = S.model_copy(
+        update={"llm": S.llm.model_copy(update={"json_retries": 0})}
+    )
+    r = run("LAB-0029", fake, db, no_retry)
+    assert r["status"] == "invalid" and len(fake.chats()) == 1
+
+
+def test_llm_event_records_random_tag(db):
+    fake = FakeLLM()
+    r = run("LAB-0029", fake, db)
+    tag = r["events"][2]["detail"]["tag"]
+    assert (
+        f"<{tag}>" in fake.chats()[0]["messages"][1]["content"]
+    )  # tái lập được prompt đã gửi
 
 
 def test_llm_down_gives_error_status_and_logs_it(db):
@@ -225,3 +279,43 @@ def test_error_run_is_saved_too(db):
         and back["result"] is None
         and back["events"][-1]["event"] == "error"
     )
+
+
+# ---------- FR-05 / FR-08: nhãn của người phân tích ----------
+def test_label_is_stored_apart_from_model_result_and_logged(db):
+    r = run("LAB-0029", FakeLLM(), db)
+    run_id = store.save_run(db, r)
+    before = store.get_run(db, run_id)
+    label = store.save_label(db, run_id, "bang", True, ["T1003.001"], "đúng LSASS dump")
+    after = store.get_run(db, run_id)
+    assert (after["result"], after["teacher"], after["raw"]) == (
+        before["result"],
+        before["teacher"],
+        before["raw"],
+    )  # FR-05: kết quả mô hình không đổi
+    assert after["labels"][0]["id"] == label["id"] and label["alert_ref"] == "LAB-0029"
+    log = after["events"][-1]
+    assert (log["event"], log["actor"], log["model"]) == (
+        "label_saved",
+        "bang",
+        "qwen3.5:4b",
+    )
+    assert log["ts"] is not None and log["detail"]["ma_attack"] == ["T1003.001"]
+    assert all(
+        e["actor"] == "tracewise" and e["model"] for e in after["events"][:-1]
+    )  # FR-08 đủ 4 trường
+
+
+def test_each_save_keeps_history_newest_first(db):
+    run_id = store.save_run(db, run("LAB-0030", FakeLLM(), db))
+    store.save_label(db, run_id, "bang", True, ["T1003.001"])
+    store.save_label(db, run_id, "hao", False, [], "chỉ một dòng log, chưa đủ")
+    labels = store.labels_of(db, "LAB-0030")
+    assert [lb["nguoi_luu"] for lb in labels[:2]] == ["hao", "bang"]
+
+
+def test_label_rules_enforced_by_database_too(db):
+    run_id = store.save_run(db, run("LAB-0029", FakeLLM(), db))
+    with pytest.raises(psycopg.errors.CheckViolation):
+        store.save_label(db, run_id, "bang", True, [])  # có căn cứ mà không có mã
+    assert store.save_label(db, 10**9, "bang", False, []) is None  # không có lần chạy

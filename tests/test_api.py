@@ -94,3 +94,50 @@ def test_startup_refuses_llm_host_outside_allowlist(db):
     with pytest.raises(srs.HostNotAllowed):
         with TestClient(app):
             pass
+
+
+def test_label_endpoint_saves_and_lists(api):
+    client, _ = api
+    run = client.post("/alerts/LAB-0029/analyze").json()
+    r = client.post(
+        f"/runs/{run['id']}/labels",
+        json={"nguoi_luu": "bang", "du_can_cu": True, "ma_attack": ["t1003.001"]},
+    )
+    assert r.status_code == 201 and r.json()["ma_attack"] == [
+        "T1003.001"
+    ]  # chuẩn hóa chữ hoa
+    assert client.get("/alerts/LAB-0029/labels").json()[0]["id"] == r.json()["id"]
+    again = client.get(f"/runs/{run['id']}").json()
+    assert again["result"] == run["result"] and len(again["labels"]) == 1
+
+
+@pytest.mark.parametrize(
+    "body, code",
+    [
+        (
+            {"nguoi_luu": "bang", "du_can_cu": True, "ma_attack": ["T9999"]},
+            422,
+        ),  # mã không có
+        (
+            {"nguoi_luu": "bang", "du_can_cu": True, "ma_attack": []},
+            422,
+        ),  # có căn cứ, không mã
+        (
+            {"nguoi_luu": "bang", "du_can_cu": False, "ma_attack": ["T1003.001"]},
+            422,
+        ),  # ngược lại
+        ({"nguoi_luu": "Bằng Bùi", "du_can_cu": False}, 422),  # mã người lưu sai dạng
+        ({"nguoi_luu": "bang", "du_can_cu": False, "role": "admin"}, 422),  # trường lạ
+    ],
+)
+def test_bad_label_is_rejected(api, body, code):
+    client, _ = api
+    run = client.post("/alerts/LAB-0029/analyze").json()
+    assert client.post(f"/runs/{run['id']}/labels", json=body).status_code == code
+
+
+def test_label_for_unknown_run_or_alert_is_404(api):
+    client, _ = api
+    body = {"nguoi_luu": "bang", "du_can_cu": False}
+    assert client.post("/runs/999999999/labels", json=body).status_code == 404
+    assert client.get("/alerts/LAB-9999/labels").status_code == 404
