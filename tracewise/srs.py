@@ -30,6 +30,7 @@ def load_alerts(path: Path = SRS_DIR / "canh_bao_lab.jsonl") -> list[dict]:
                         print(f"Error: dòng {line_no} không phải JSON hợp lệ ({e})")
                         continue
                     results.append(normalize_alert_line(item))
+    return results
 def normalize_alert_line(item: dict) -> dict:
     if isinstance(item, dict) and item.get("id") not in (None, ""):
         return item
