@@ -319,3 +319,10 @@ def test_label_rules_enforced_by_database_too(db):
     with pytest.raises(psycopg.errors.CheckViolation):
         store.save_label(db, run_id, "bang", True, [])  # có căn cứ mà không có mã
     assert store.save_label(db, 10**9, "bang", False, []) is None  # không có lần chạy
+
+
+def test_without_rule_line_for_injection_measurement(db):
+    svc = pipeline.load_services(S, conn=db, transport=FakeLLM().transport())
+    r = pipeline.analyze(ALERTS["LAB-0033"], svc, with_rule=False)
+    assert not any("prompt_injection_test" in line for line in r["pack"].values())
+    assert r["config"]["with_rule"] is False and list(r["pack"])[0] == "E1"

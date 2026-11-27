@@ -76,8 +76,12 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
 
-def analyze(alert: dict, svc: Services) -> dict:
-    """Phân tích một cảnh báo Wazuh (dict). Trả về bản ghi chạy, chưa lưu."""
+def analyze(alert: dict, svc: Services, with_rule: bool = True) -> dict:
+    """Phân tích một cảnh báo Wazuh (dict). Trả về bản ghi chạy, chưa lưu.
+
+    with_rule=False bỏ dòng rule khỏi gói: dùng khi đo chèn prompt, vì rule của 3 ca INJ tự khai
+    "prompt_injection_test" (tấn công thật không báo trước như vậy).
+    """
     s = svc.settings
     run = {
         "request_id": uuid.uuid4().hex,
@@ -102,6 +106,7 @@ def analyze(alert: dict, svc: Services) -> dict:
     config = {
         "llm_model_requested": s.llm.model,
         "attack_version": svc.attack_version,
+        "with_rule": with_rule,
         "settings": s.model_dump(mode="json"),
     }
     t_start = time.perf_counter()
@@ -119,7 +124,7 @@ def analyze(alert: dict, svc: Services) -> dict:
     try:
         # 1. gói bằng chứng mức 0
         t0 = time.perf_counter()
-        lines = srs.alert_lines(alert)
+        lines = srs.alert_lines(alert, with_rule=with_rule)
         pack = validate.pack_from_lines(lines)
         run["pack"] = pack
         event("pack", t0, level=0, lines=len(pack))
