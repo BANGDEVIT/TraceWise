@@ -10,14 +10,32 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from .settings import ROOT
 
+import hashlib
 SRS_DIR = ROOT / "data" / "srs"
 
 
 # ---------- dữ liệu của thầy ----------
 def load_alerts(path: Path = SRS_DIR / "canh_bao_lab.jsonl") -> list[dict]:
     """35 cảnh báo lab, mỗi phần tử là một cảnh báo Wazuh (dict), giữ đúng thứ tự trong file."""
+    results = []
     with open(path, encoding="utf-8") as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for line_no, raw_line in enumerate(f, start=1):
+                    line = raw_line.strip()
+                    if not line:
+                        continue
+                    try:
+                        item = json.loads(line)
+                    except json.JSONDecodeError as e:
+                        #try to load again
+                        print(f"Error: dòng {line_no} không phải JSON hợp lệ ({e})")
+                        continue
+                    results.append(normalize_alert_line(item))
+def normalize_alert_line(item: dict) -> dict:
+    if isinstance(item, dict) and item.get("id") not in (None, ""):
+        return item
+    canonical = json.dumps(item, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    item["id"]= hashlib.md5(canonical.encode("utf-8")).hexdigest()
+    return item
 
 
 def load_whitelist(path: Path = SRS_DIR / "attack_subset.csv") -> list[dict]:
